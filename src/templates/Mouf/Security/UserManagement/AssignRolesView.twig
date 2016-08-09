@@ -1,0 +1,15 @@
+<h1>Assign roles to {{ user.login }}</h1>
+
+<p>Select roles for user "{{ user.login }}":</p>
+
+<form method="post">
+    {% for role in roles %}
+    <div class="checkbox">
+        <label>
+            <input type="checkbox" value="{{ role.role.id }}" name="roles[]" {% if role.hasRole %}checked="true"{% endif %}>
+            {{ role.role.label }}
+        </label>
+    </div>
+    {% endfor %}
+    <button class="btn btn-primary" type="submit">Assign these roles</button>
+</form>

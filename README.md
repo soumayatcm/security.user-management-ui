@@ -31,3 +31,7 @@ Install the package using the Mouf installer.
 This package **provides**:
 
 TODO
+
+Expectations
+
+TODO: rights: CAN_ASSIGN_ROLES, CAN_ACCESS_ADMIN_USER_LIST

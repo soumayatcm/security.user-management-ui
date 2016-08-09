@@ -1,6 +1,7 @@
 <?php
+declare(strict_types=1);
 
-namespace Mouf\Security\Password;
+namespace Mouf\Security\UserManagement;
 
 use Mouf\Actions\InstallUtils;
 use Mouf\Html\Renderer\RendererUtils;
