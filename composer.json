@@ -1,6 +1,6 @@
 {
 	"name" : "mouf/security.user-management-ui",
-	"description" : "A 'forgot your password' feature for Mouf security.",
+	"description" : "A set of user interfaces for managing users (listing users, setting roles, etc..)",
 	"keywords" : [
 		"mouf",
 		"password"
