@@ -86,7 +86,7 @@ class AdminUserListController
     /**
      * Displays the HTML screen allowing to edit a user roles.
      *
-     * @URL("{this->baseUrl}/")
+     * @URL("{$this->baseUrl}/")
      * @Get()
      */
     public function index() : ResponseInterface
@@ -102,7 +102,7 @@ class AdminUserListController
     /**
      * Displays the HTML screen allowing to edit a user roles.
      *
-     * @URL("{this->baseUrl}/list")
+     * @URL("{$this->baseUrl}/list")
      * @Get()
      */
     public function list(string $q = null, $offset, $limit, $sortKey, $sortOrder) : ResponseInterface

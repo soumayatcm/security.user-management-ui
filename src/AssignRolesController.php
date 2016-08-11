@@ -86,7 +86,7 @@ class AssignRolesController
     /**
      * Displays the HTML screen allowing to edit a user roles.
      *
-     * @URL("{this->baseUrl}/{userId}/roles")
+     * @URL("{$this->baseUrl}/{userId}/roles")
      * @Get()
      *
      * @param string $user_id
@@ -125,7 +125,7 @@ class AssignRolesController
 
     /**
      *
-     * @URL("{this->baseUrl}/{userId}/roles")
+     * @URL("{$this->baseUrl}/{userId}/roles")
      * @Post()
      *
      * @param string $userId
