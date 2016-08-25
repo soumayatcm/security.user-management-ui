@@ -28,43 +28,43 @@ use Zend\Diactoros\Response\RedirectResponse;
  */
 class AdminUserListController
 {
-    private $baseUrl;
+    protected $baseUrl;
 
     /**
      * The logger used by this controller.
      *
      * @var LoggerInterface
      */
-    private $logger;
+    protected $logger;
 
     /**
      * The template used by this controller.
      *
      * @var TemplateInterface
      */
-    private $template;
+    protected $template;
 
     /**
      * The main content block of the page.
      *
      * @var HtmlBlock
      */
-    private $content;
+    protected $content;
 
     /**
      * @var UserListDao
      */
-    private $userDao;
+    protected $userDao;
 
     /**
      * @var EvoluGrid
      */
-    private $grid;
+    protected $grid;
 
     /**
      * @var EvoluGridResultSet
      */
-    private $resultSet;
+    protected $resultSet;
 
     /**
      * @param LoggerInterface $logger The logger
