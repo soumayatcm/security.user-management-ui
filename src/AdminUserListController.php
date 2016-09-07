@@ -105,7 +105,7 @@ class AdminUserListController
      * @URL("{$this->baseUrl}/list")
      * @Get()
      */
-    public function list(string $q = null, $offset, $limit, $sortKey, $sortOrder) : ResponseInterface
+    public function list($offset, $limit, $sortKey, $sortOrder, string $q = null) : ResponseInterface
     {
         $users = $this->userDao->search([
             'q' => $q
