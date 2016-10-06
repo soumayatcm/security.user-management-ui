@@ -8,6 +8,7 @@ use Mouf\Html\HtmlElement\HtmlBlock;
 use Mouf\Html\Template\TemplateInterface;
 use Mouf\Html\Widgets\EvoluGrid\EvoluGrid;
 use Mouf\Html\Widgets\EvoluGrid\EvoluGridResultSet;
+use Mouf\Html\Widgets\EvoluGrid\SimpleColumn;
 use Mouf\Mvc\Splash\Annotations\Get;
 use Mouf\Mvc\Splash\Annotations\Post;
 use Mouf\Mvc\Splash\Annotations\URL;
@@ -15,6 +16,7 @@ use Mouf\Mvc\Splash\Exception\PageNotFoundException;
 use Mouf\Mvc\Splash\HtmlResponse;
 use Mouf\Security\Right;
 use Mouf\Security\UserManagement\Api\RoleDao;
+use Mouf\Security\UserManagement\Api\RoleListDao;
 use Mouf\Security\UserManagement\Api\UserListDao;
 use Mouf\Security\UserService\UserDaoInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -22,11 +24,11 @@ use Psr\Log\LoggerInterface;
 use Zend\Diactoros\Response\RedirectResponse;
 
 /**
- * Controller in charge of listing users.
+ * Controller in charge of listing roles.
  *
- * @Right("CAN_ACCESS_ADMIN_USER_LIST")
+ * @Right("CAN_ACCESS_ADMIN_ROLES_LIST")
  */
-class AdminUserListController
+class AdminRolesListController
 {
     protected $baseUrl;
 
@@ -52,9 +54,9 @@ class AdminUserListController
     protected $content;
 
     /**
-     * @var UserListDao
+     * @var RoleListDao
      */
-    protected $userDao;
+    protected $roleDao;
 
     /**
      * @var EvoluGrid
@@ -72,12 +74,12 @@ class AdminUserListController
      * @param HtmlBlock $content The main content block of the page
      * @param string $baseUrl The base URL for this container (defaults to "user_admin")
      */
-    public function __construct(LoggerInterface $logger, TemplateInterface $template, HtmlBlock $content, UserListDao $userDao, EvoluGrid $grid, EvoluGridResultSet $resultSet, string $baseUrl = 'user_admin')
+    public function __construct(LoggerInterface $logger, TemplateInterface $template, HtmlBlock $content, RoleListDao $roleDao, EvoluGrid $grid, EvoluGridResultSet $resultSet, string $baseUrl = 'roles_admin')
     {
         $this->logger = $logger;
         $this->template = $template;
         $this->content = $content;
-        $this->userDao = $userDao;
+        $this->roleDao = $roleDao;
         $this->grid = $grid;
         $this->resultSet = $resultSet;
         $this->baseUrl = $baseUrl;
@@ -91,9 +93,7 @@ class AdminUserListController
      */
     public function index() : ResponseInterface
     {
-
-
-        $view = new ListUsersView($this->grid);
+        $view = new ListRolesView($this->grid);
 
         $this->content->addHtmlElement($view);
         return new HtmlResponse($this->template);
@@ -107,28 +107,16 @@ class AdminUserListController
      */
     public function list($offset, $limit, $sortKey, $sortOrder, string $q = null) : ResponseInterface
     {
-        $users = $this->userDao->search([
+        $roles = $this->roleDao->search([
             'q' => $q
         ], (string) $sortKey, (string) $sortOrder);
 
-        $results = $users->take($offset, $limit);
+        $results = $roles->take($offset, $limit);
 
-        $userArr = [];
-
-        foreach ($results as $user) {
-            $roles = $user->getRoles();
-            $rolesStr = array_map(function($role) {return $role->getLabel();},$roles);
-            $rolesStr = implode(', ', $rolesStr);
-
-            $userArr[] = [
-                'id' => $user->getId(),
-                'login' => $user->getLogin(),
-                'roles' => $rolesStr
-            ];
-        }
-
-        $this->resultSet->setResults($userArr);
+        $this->resultSet->setResults($results);
+        //$this->resultSet->setTotalRowsCount($results->totalCount());
 
         return $this->resultSet->getResponse();
     }
+
 }

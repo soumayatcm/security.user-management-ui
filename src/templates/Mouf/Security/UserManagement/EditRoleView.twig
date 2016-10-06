@@ -1,0 +1,22 @@
+<h1>Edit role {{ role.label }}</h1>
+
+<form method="post">
+
+    <div class="form-group">
+        <label for="label">Label</label>
+        <input type="text" class="form-control" id="label" placeholder="Label" required value="{{ role.label }}">
+    </div>
+
+    <div><label>Rights</label></div>
+
+    {% for right in rights %}
+    <div class="checkbox">
+        <label>
+            <input type="checkbox" value="{{ right.right.name }}" name="rights[]" {% if right.hasRight %}checked="true"{% endif %}>
+            {% if right.right.description %}{{ right.right.description }} <small>({{ right.right.name }})</small>{% else %}
+            {{ right.right.name }}{% endif %}
+        </label>
+    </div>
+    {% endfor %}
+    <button class="btn btn-primary" type="submit">Save role</button>
+</form>
