@@ -114,7 +114,6 @@ class AdminRolesListController
         $results = $roles->take($offset, $limit);
 
         $this->resultSet->setResults($results);
-        //$this->resultSet->setTotalRowsCount($results->totalCount());
 
         return $this->resultSet->getResponse();
     }

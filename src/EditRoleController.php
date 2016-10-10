@@ -11,10 +11,13 @@ use Mouf\Mvc\Splash\Annotations\Post;
 use Mouf\Mvc\Splash\Annotations\URL;
 use Mouf\Mvc\Splash\Exception\PageNotFoundException;
 use Mouf\Mvc\Splash\HtmlResponse;
+use Mouf\Security\Model\Role;
 use Mouf\Security\Right;
 use Mouf\Security\UserManagement\Api\RightDao;
 use Mouf\Security\UserManagement\Api\RoleDao;
 use Mouf\Security\UserManagement\Api\RoleRightDao;
+use Mouf\Security\UserManagement\Rights\HierarchicalRightsRegistry;
+use Mouf\Security\UserManagement\Rights\RightCategory;
 use Mouf\Security\UserService\UserDaoInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
@@ -99,6 +102,7 @@ class EditRoleController
     /**
      * Displays the HTML screen allowing to edit a user roles.
      *
+     * @URL("{$this->baseUrl}/new")
      * @URL("{$this->baseUrl}/{roleId}")
      * @Get()
      *
@@ -108,31 +112,52 @@ class EditRoleController
      *
      * @return ResponseInterface
      */
-    public function viewRole(string $roleId) : ResponseInterface
+    public function viewRole(string $roleId = null) : ResponseInterface
     {
-        $role = $this->roleDao->getRoleById($roleId);
-        if ($role === null) {
-            throw new PageNotFoundException(sprintf('Could not find user with ID %s',$roleId));
-        }
-
-        $allRights = $this->rightDao->getAllRights();
-
-        $roleRights = $this->roleRightDao->getRightsForRole($role);
-
         $roleRightsByName = [];
-        foreach ($roleRights as $right) {
-            $roleRightsByName[$right->getRightKey()] = $right;
+        if ($roleId !== null) {
+            $role = $this->roleDao->getRoleById($roleId);
+            if ($role === null) {
+                throw new PageNotFoundException(sprintf('Could not find user with ID %s',$roleId));
+            }
+            $roleRights = $this->roleRightDao->getRightsForRole($role);
+
+
+            foreach ($roleRights as $right) {
+                $roleRightsByName[$right->getName()] = $right;
+            }
+        } else {
+            $role = new Role(null, '');
         }
 
-        $rights = [];
-        foreach ($allRights as $right) {
-            $rights[] = [
-                'hasRight' => isset($roleRightsByName[$right->getName()]),
-                'right' => $right
+        if ($this->rightDao instanceof HierarchicalRightsRegistry) {
+            $rightsCategories = $this->rightDao->getRightCategories();
+        } else {
+            $rightsCategories = [
+                new RightCategory("Rights", "", $this->rightDao->getAllRights())
             ];
         }
 
-        $view = new EditRoleView($role, $rights);
+
+
+
+        $categories = [];
+        foreach ($rightsCategories as $category) {
+            $categoryArr = [];
+            $categoryArr['name'] = $category->getName();
+            $categoryArr['description'] = $category->getDescription();
+            $rights = [];
+            foreach ($category->getRights() as $right) {
+                $rights[] = [
+                    'hasRight' => isset($roleRightsByName[$right->getName()]),
+                    'right' => $right
+                ];
+            }
+            $categoryArr['rights'] = $rights;
+            $categories[] = $categoryArr;
+        }
+
+        $view = new EditRoleView($role, $categories, $this->backUrl);
 
         $this->content->addHtmlElement($view);
         return new HtmlResponse($this->template);
@@ -140,6 +165,7 @@ class EditRoleController
 
     /**
      *
+     * @URL("{$this->baseUrl}/new")
      * @URL("{$this->baseUrl}/{roleId}")
      * @Post()
      *
@@ -149,12 +175,20 @@ class EditRoleController
      * @return ResponseInterface
      * @throws PageNotFoundException
      */
-    public function editRole(string $roleId, array $rights = array()) : ResponseInterface
+    public function editRole(string $roleId = null, string $label, array $rights = array()) : ResponseInterface
     {
-        $role = $this->roleDao->getRoleById($roleId);
-        if ($role === null) {
-            throw new PageNotFoundException(sprintf('Could not find role with ID %s', $roleId));
+        if ($roleId != null) {
+            $role = $this->roleDao->getRoleById($roleId);
+            if ($role === null) {
+                throw new PageNotFoundException(sprintf('Could not find role with ID %s', $roleId));
+            }
+            if ($label !== $role->getLabel()) {
+                $this->roleDao->renameRole($roleId, $label);
+            }
+        } else {
+            $role = $this->roleDao->createRole($label);
         }
+
 
         $rightArr = [];
 
@@ -163,6 +197,24 @@ class EditRoleController
         }
 
         $this->roleRightDao->setRightsForRole($role, $rightArr);
+
+        return new RedirectResponse('../../'.ltrim($this->backUrl,'/'));
+    }
+
+    /**
+     *
+     * @URL("{$this->baseUrl}/{roleId}/delete")
+     *
+     * @param string $roleId
+     * @return ResponseInterface
+     */
+    public function deleteRole(string $roleId) : ResponseInterface
+    {
+        $role = $this->roleDao->getRoleById($roleId);
+        if ($role === null) {
+            throw new PageNotFoundException(sprintf('Could not find role with ID %s', $roleId));
+        }
+        $this->roleDao->deleteRole($roleId);
 
         return new RedirectResponse('../../'.ltrim($this->backUrl,'/'));
     }

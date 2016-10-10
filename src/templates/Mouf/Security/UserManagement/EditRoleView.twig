@@ -4,19 +4,41 @@
 
     <div class="form-group">
         <label for="label">Label</label>
-        <input type="text" class="form-control" id="label" placeholder="Label" required value="{{ role.label }}">
+        <input type="text" name="label" class="form-control" id="label" placeholder="Label" required value="{{ role.label }}">
     </div>
 
     <div><label>Rights</label></div>
 
-    {% for right in rights %}
-    <div class="checkbox">
-        <label>
-            <input type="checkbox" value="{{ right.right.name }}" name="rights[]" {% if right.hasRight %}checked="true"{% endif %}>
-            {% if right.right.description %}{{ right.right.description }} <small>({{ right.right.name }})</small>{% else %}
-            {{ right.right.name }}{% endif %}
-        </label>
-    </div>
+
+    <ul class="nav nav-tabs" role="tablist">
+        {% for category in categories %}
+        <li role="presentation" {% if loop.first %}class="active"{% endif %}><a href="#{{ category.name|e('css') }}" aria-controls="{{ category.name|e('css') }}" role="tab" data-toggle="tab">{{ category.name }}</a></li>
+        {% endfor %}
+    </ul>
+
+    <div class="tab-content">
+    {% for category in categories %}
+        <div role="tabpanel" class="tab-pane fade {% if loop.first %}in active{% endif %}" id="{{ category.name|e('css') }}">
+            <p><small>{{ category.description }}</small></p>
+            {% for right in category.rights %}
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" value="{{ right.right.name }}" name="rights[]" {% if right.hasRight %}checked="true"{% endif %}>
+                    {% if right.right.description %}{{ right.right.description }} <small>({{ right.right.name }})</small>{% else %}
+                    {{ right.right.name }}{% endif %}
+                </label>
+            </div>
+            {% endfor %}
+        </div>
     {% endfor %}
+    </div>
     <button class="btn btn-primary" type="submit">Save role</button>
+    <a href="{{ constant('ROOT_URL') ~ backUrl }}" class="btn btn-default">Back to roles list</a>
+    <a href="{{ role.id }}/delete" class="btn btn-danger pull-right" id="delete-role">Delete this role</a>
 </form>
+
+<script type="application/javascript">
+    jQuery('#delete-role').click(function() {
+        return confirm('Are you sure you want to delete this role?');
+    });
+</script>

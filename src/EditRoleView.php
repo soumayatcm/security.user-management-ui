@@ -24,16 +24,24 @@ class EditRoleView implements HtmlElementInterface
      *
      * @var array
      */
-    private $rights;
+    private $categories;
+
+    /**
+     * The URL of the back button.
+     *
+     * @var string
+     */
+    private $backUrl;
 
     /**
      * @param RoleInterface $role
-     * @param array $rights
+     * @param array $categories
      */
-    public function __construct(RoleInterface $role, array $rights)
+    public function __construct(RoleInterface $role, array $categories, string $backUrl = null)
     {
         $this->role = $role;
-        $this->rights = $rights;
+        $this->categories = $categories;
+        $this->backUrl = $backUrl;
     }
 
 }
