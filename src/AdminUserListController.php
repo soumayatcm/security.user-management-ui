@@ -111,23 +111,9 @@ class AdminUserListController
             'q' => $q
         ], (string) $sortKey, (string) $sortOrder);
 
-        $results = $users->take($offset, $limit);
+        $users = $users->take($offset, $limit);
 
-        $userArr = [];
-
-        foreach ($results as $user) {
-            $roles = $user->getRoles();
-            $rolesStr = array_map(function($role) {return $role->getLabel();},$roles);
-            $rolesStr = implode(', ', $rolesStr);
-
-            $userArr[] = [
-                'id' => $user->getId(),
-                'login' => $user->getLogin(),
-                'roles' => $rolesStr
-            ];
-        }
-
-        $this->resultSet->setResults($userArr);
+        $this->resultSet->setResults($users);
 
         return $this->resultSet->getResponse();
     }
