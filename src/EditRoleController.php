@@ -11,7 +11,7 @@ use Mouf\Mvc\Splash\Annotations\Post;
 use Mouf\Mvc\Splash\Annotations\URL;
 use Mouf\Mvc\Splash\Exception\PageNotFoundException;
 use Mouf\Mvc\Splash\HtmlResponse;
-use Mouf\Security\Model\Role;
+use Mouf\Security\UserManagement\Role;
 use Mouf\Security\Right;
 use Mouf\Security\UserManagement\Api\RightDao;
 use Mouf\Security\UserManagement\Api\RoleDao;
