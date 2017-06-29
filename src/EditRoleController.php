@@ -216,6 +216,6 @@ class EditRoleController
         }
         $this->roleDao->deleteRole($roleId);
 
-        return new RedirectResponse('../../'.ltrim($this->backUrl,'/'));
+        return new RedirectResponse('../../../'.ltrim($this->backUrl,'/'));
     }
 }
