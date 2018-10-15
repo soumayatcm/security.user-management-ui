@@ -105,11 +105,11 @@ class AdminUserListController
      * @URL("{$this->baseUrl}/list")
      * @Get()
      */
-    public function list($offset, $limit, $sortKey, $sortOrder, string $q = null) : ResponseInterface
+    public function list($offset, $limit, $sort_key, $sort_order, string $q = null) : ResponseInterface
     {
         $users = $this->userDao->search([
             'q' => $q
-        ], (string) $sortKey, (string) $sortOrder);
+        ], (string) $sort_key, (string) $sort_order);
 
         $users = $users->take($offset, $limit);
 
